@@ -1,0 +1,19 @@
+{
+  "name": "cooklang",
+  "version": "1.0.0",
+  "description": "Create and manage Cooklang recipe files. Use when working with .cook files for recipes, meal planning, shopping lists, and pantry management.",
+  "author": {
+    "name": "Cooklang",
+    "url": "https://cooklang.org/"
+  },
+  "repository": "https://github.com/cooklang/cooklang-skills",
+  "license": "MIT",
+  "keywords": [
+    "cooklang",
+    "recipes",
+    "cooking",
+    "meal-planning",
+    "shopping-list",
+    "pantry"
+  ]
+}

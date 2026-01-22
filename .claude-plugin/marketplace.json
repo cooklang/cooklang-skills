@@ -1,0 +1,15 @@
+{
+  "name": "cooklang-skills",
+  "owner": {
+    "name": "Cooklang",
+    "url": "https://cooklang.org/"
+  },
+  "plugins": [
+    {
+      "name": "cooklang",
+      "source": "./",
+      "description": "Claude Skills for Cooklang",
+      "version": "1.0.0"
+    }
+  ]
+}
