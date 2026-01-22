@@ -6,9 +6,9 @@ Claude skills for writing and managing recipes with [Cooklang](https://cooklang.
 
 ### Marketplace (Recommended)
 
-```bash
-# Claude Code
-claude mcp add-skill cooklang-skills --from github:cooklang/cooklang-skills
+```
+/plugin marketplace add cooklang/cooklang-skills
+/plugin install cooklang@cooklang-skills
 ```
 
 ### Manual Installation
