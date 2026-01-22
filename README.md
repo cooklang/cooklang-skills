@@ -40,7 +40,7 @@ Some skills require [CookCLI](https://cooklang.org/cli/) for full functionality:
 
 ```bash
 # macOS
-brew install cooklang/tap/cookcli
+brew install cookcli
 
 # From source
 cargo install cookcli
