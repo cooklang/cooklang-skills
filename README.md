@@ -4,12 +4,19 @@ Claude skills for writing and managing recipes with [Cooklang](https://cooklang.
 
 ## Installation
 
-### Claude Code
+### Marketplace (Recommended)
 
+```bash
+# Claude Code
+claude mcp add-skill cooklang-skills --from github:cooklang/cooklang-skills
+```
+
+### Manual Installation
+
+**Claude Code:**
 Add the `skills/` directory contents to your project's `/.claude/skills/` folder.
 
-### Codex CLI
-
+**Codex CLI:**
 Add the `skills/` directory contents to `~/.codex/skills/`.
 
 ## Skills
