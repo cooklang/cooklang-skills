@@ -21,6 +21,22 @@ Add the `skills/` directory contents to `~/.codex/skills/`.
 
 ## Skills
 
+Each skill lives in its own subdirectory under `skills/` with a `SKILL.md` file:
+
+```
+skills/
+├── create-recipe/SKILL.md
+├── convert-recipe/SKILL.md
+├── validate-recipes/SKILL.md
+├── shopping-list/SKILL.md
+├── search-recipes/SKILL.md
+├── scale-recipe/SKILL.md
+├── organize-collection/SKILL.md
+├── meal-plan/SKILL.md
+├── manage-pantry/SKILL.md
+└── export-recipe/SKILL.md
+```
+
 | Skill | Description |
 |-------|-------------|
 | `create-recipe` | Create new Cooklang recipes interactively from description or template |
