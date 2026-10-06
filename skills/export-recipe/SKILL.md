@@ -1,194 +1,82 @@
 ---
 name: export-recipe
-description: Convert Cooklang recipes to Markdown, JSON, YAML, or other formats
+description: Use when the user wants a Cooklang recipe (.cook) or meal plan (.menu) in another format - Markdown for a blog or notes, JSON or YAML for an app, plain text to paste or print, HTML, LaTeX - or a reusable export template. Not for importing into Cooklang (recipe-import).
 ---
 
-# Export Recipe
+# Skill: export-recipe
 
-## Overview
+Use when the user wants a recipe or plan turned into Markdown, JSON, YAML, plain text, HTML, LaTeX or another format to share, paste, print or feed to another program.
 
-Convert `.cook` recipes to other formats for sharing or integration:
-- **Markdown** - For blogs, notes, sharing
-- **JSON** - For apps and APIs
-- **YAML** - For configuration/data pipelines
-- **LaTeX** - For printed cookbooks
+**Needs the Cook MCP server** (tools like `read_recipe` and `validate`). If these tools are missing, the Cook MCP server isn't connected: if you installed the cooklang plugin or extension, check that its `cook` server is running (e.g. `/mcp`) or reinstall it; otherwise add it from https://github.com/cook-md/cook-mcp. Do not rewrite a recipe from memory instead.
 
-Use this skill when:
-- Sharing a recipe on a blog or social media
-- Integrating with other apps
-- Creating a printable cookbook
-- Backing up in portable format
+There is no export tool. Build the export from one of two sources, and never retype quantities yourself.
 
-## Process
+## Route 1: from `read_recipe` (one-off exports)
 
-### Step 1: Identify Recipe(s)
+`read_recipe` (`path`, optional `scale`) returns the parsed recipe; build the format from it:
 
-Ask: "Which recipe(s) do you want to export?"
-- Single: `Recipe.cook`
-- Multiple: `Recipe1.cook Recipe2.cook`
-- Pattern: `dinner/*.cook`
+- `recipe.metadata.map` — frontmatter (title, servings, tags, times, source…). `title` is also top-level.
+- `recipe.ingredients[]` — `name`, `note` (the `(…)` preparation), `quantity` (`null` when none), and `reference` set for `@./` sub-recipes. A quantity is `{unit, value}` where `value` is tagged by `type`: a plain number sits at `quantity.value.value.value` (`{"type": "number", "value": {"type": "regular", "value": 200.0}}`), but it can also be a range or free text, so don't assume a number.
+- `recipe.cookware[]` — `name`; `recipe.timers[]` — `quantity` in the same shape.
+- `recipe.sections[]` — optional `name`, then `content`: steps (`items` are text pieces plus `ingredient` / `cookware` / `timer` entries pointing by `index` into the lists above) and text blocks (notes). Rebuild a step's sentence by substituting each indexed item.
+- With `scale`, every quantity is already scaled (scale-recipe skill).
 
-### Step 2: Choose Format
+Use this route for the structure (which fields, what shape). To print quantities and step sentences, Route 2 is safer: `{{ i.quantity }}` renders the amount and unit exactly as the apps do, ranges and text included, and steps come out with amounts filled in.
 
-Options:
-- **Markdown** - Human-readable, good for sharing
-- **JSON** - Structured data for apps
-- **YAML** - Structured, more readable than JSON
-- **LaTeX** - For PDF/print generation
-
-### Step 3: Export
-
-**Single recipe:**
-```bash
-cook recipe "Recipe.cook" -f markdown
-cook recipe "Recipe.cook" -f json
-cook recipe "Recipe.cook" -f yaml
-```
-
-**Save to file:**
-```bash
-cook recipe "Recipe.cook" -f markdown -o recipe.md
-cook recipe "Recipe.cook" -f json -o recipe.json
-```
-
-**Batch export:**
-```bash
-for f in *.cook; do
-  cook recipe "$f" -f markdown -o "${f%.cook}.md"
-done
-```
-
-### Step 4: Post-Processing (Optional)
-
-For markdown:
-- Add header image reference
-- Adjust formatting for target platform
-
-For JSON:
-- Pretty print if needed
-- Validate structure
-
-## Examples
-
-**User:** "Export pasta recipe as markdown for my blog"
-
-**Run:**
-```bash
-cook recipe "Pasta Carbonara.cook" -f markdown
-```
-
-**Output:**
-```markdown
-# Pasta Carbonara
-
-**Servings:** 4
-**Time:** 25 minutes
-**Tags:** italian, pasta, dinner
-
-## Ingredients
-
-- 400g spaghetti
-- 150g pancetta
-- 4 eggs
-- 100g parmesan (finely grated)
-- Black pepper (freshly ground)
-- Salt (1 pinch)
-
-## Equipment
-
-- Large pot
-- Pan
-- Bowl
-
-## Instructions
-
-1. Cook **400g spaghetti** in a **large pot** of salted boiling water until al dente.
-
-2. While pasta cooks, cut **150g pancetta** into small cubes and fry in a **pan** until crispy.
-
-3. In a **bowl**, whisk **4 eggs** with **100g parmesan** (finely grated) and **black pepper** (freshly ground).
-
-4. Reserve ~1/2 cup pasta water, then drain the spaghetti.
-
-5. Remove pan from heat. Add hot pasta to pancetta, then quickly pour in egg mixture, tossing constantly.
-
-6. Add pasta water a splash at a time if needed to loosen the sauce.
-
-7. Serve immediately with extra parmesan and black pepper.
-```
-
-**User:** "Export all dinner recipes as JSON"
-
-**Run:**
-```bash
-for f in dinner/*.cook; do
-  cook recipe "$f" -f json -o "export/$(basename ${f%.cook}).json"
-done
-```
-
-## Reference
-
-### Export Commands
-
-```bash
-# Format options
-cook recipe "Recipe.cook" -f markdown
-cook recipe "Recipe.cook" -f json
-cook recipe "Recipe.cook" -f yaml
-cook recipe "Recipe.cook" -f latex
-
-# Save to file
-cook recipe "Recipe.cook" -f markdown -o output.md
-
-# With scaling
-cook recipe "Recipe.cook:2" -f markdown
-```
-
-### Format Comparison
-
-| Format | Best For | Pros | Cons |
-|--------|----------|------|------|
-| Markdown | Sharing, blogs | Readable, universal | No structure |
-| JSON | Apps, APIs | Structured, parseable | Not human-friendly |
-| YAML | Config, readable data | Structured + readable | Whitespace sensitive |
-| LaTeX | Print, PDF | Beautiful output | Complex setup |
-
-### JSON Structure
+Good for JSON, where you choose the shape: keep it simple and say which fields you included, for example
 
 ```json
 {
-  "title": "Recipe Name",
-  "metadata": {
-    "servings": 4,
-    "time": "30 minutes",
-    "tags": ["dinner", "quick"]
-  },
-  "ingredients": [
-    {"name": "flour", "quantity": 500, "unit": "g"},
-    {"name": "eggs", "quantity": 2, "unit": null}
-  ],
-  "cookware": ["bowl", "pan"],
-  "timers": [
-    {"name": null, "duration": 15, "unit": "minutes"}
-  ],
-  "steps": [
-    "Step 1 text...",
-    "Step 2 text..."
-  ]
+  "title": "Carbonara",
+  "servings": 2,
+  "tags": ["pasta"],
+  "ingredients": [{"name": "spaghetti", "quantity": 200, "unit": "g", "note": null}],
+  "cookware": ["large pot"],
+  "steps": ["Cook 200 g spaghetti in a large pot for 10 minutes."]
 }
 ```
 
-### Batch Export Script
+If the user names a target schema (schema.org `Recipe` JSON-LD, another app's import format), map onto that instead.
 
-```bash
-#!/bin/bash
-# Export all recipes to markdown
+## Route 2: `render_report` with a template (repeatable exports)
 
-mkdir -p export
+A Jinja template renders the same layout for any recipe, and can be saved and reused. Plain templates render locally with no login. The template context has `metadata`, `ingredients` (`.name`, `.quantity`, `.note`), `cookware` (`.name`), `sections` (each has `.name`; iterating one yields its steps, which print as numbered lines with quantities filled in) and `scale`. A Markdown export:
 
-for recipe in **/*.cook; do
-  name=$(basename "${recipe%.cook}")
-  cook recipe "$recipe" -f markdown -o "export/$name.md"
-  echo "Exported: $name"
-done
+```jinja
+# {{ metadata.title | default("Recipe") }}
+
+{% if metadata.servings %}**Servings:** {{ metadata.servings }}
+{% endif %}
+## Ingredients
+
+{% for i in ingredients -%}
+- {% if i.quantity %}{{ i.quantity }} {% endif %}{{ i.name }}{% if i.note %} ({{ i.note }}){% endif %}
+{% endfor %}
+{% if cookware %}## Equipment
+
+{% for c in cookware -%}
+- {{ c.name }}
+{% endfor %}{% endif %}
+## Method
+{% for section in sections %}
+{% if section.name %}### {{ section.name }}
+{% endif %}{% for content in section %}
+{{ content }}
+{%- endfor %}
+{% endfor %}
 ```
+
+Call `render_report` with `template` (inline) and `input_path` (plus `scale` if wanted). Plain text is the same template without the Markdown marks; HTML wraps the same loops in tags. Any text format works the same way, since the template is just Jinja: YAML and LaTeX come from a template written in that format (saved as `export.yaml.jinja` / `export.tex.jinja`). Mind whitespace control (`-%}`) where indentation matters, as in YAML. For a `.menu`, the template reads `plan` instead of `ingredients`; see the report-authoring skill for the plan context, filters and datastore functions.
+
+If the user will export again, offer to save the template with `write_config` (`path` e.g. `reports/export.md.jinja`; the inner extension names the format: `.md.jinja`, `.txt.jinja`, `.html.jinja`, `.yaml.jinja`, `.tex.jinja`) and render it later with `template_path`.
+
+## Where the export goes
+
+- cook-mcp does not write export files: `write_recipe` / `write_menu` save Cooklang and `write_config` saves only config and templates. Show the export in the reply, or, if the user wants a file, save it with your client's own file tools and say where.
+- Many recipes at once ("export all of Desserts/"): `list_recipes` with `dir`, then one `read_recipe` or `render_report` per file. Tell the user how many files first if it is more than about 10.
+
+## Rules
+
+- Quantities, names and steps come from the tools' output, not from your reading of the source. Keep the recipe's units; convert only if asked.
+- Keep `source` / `author` from the frontmatter in the export so the original stays credited.
+- Exporting never changes the `.cook` file.

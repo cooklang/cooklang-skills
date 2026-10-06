@@ -1,275 +1,63 @@
 ---
 name: organize-collection
-description: Structure recipe folders, audit metadata consistency, and set up configuration files
+description: Use when the user wants whole-library work on a Cooklang recipe collection - organizing or tidying the folder structure, a metadata consistency audit across all .cook files (missing servings, inconsistent tags), first-time setup of config/aisle.conf and config/pantry.conf, or a health check of everything. For a single aisle or pantry tweak use shopping-list or pantry.
 ---
 
-# Organize Collection
+# Skill: organize-collection
 
-## Overview
+Use when the user wants their recipe collection structured, audited or set up: folders, consistent metadata, shopping-list and pantry config, or a whole-library check.
 
-Help structure and maintain a recipe collection:
-- Organize folder structure
-- Audit metadata consistency
-- Set up aisle.conf for shopping lists
-- Configure pantry.conf for inventory
+**Needs the Cook MCP server** (tools like `list_recipes` and `validate`). If these tools are missing, the Cook MCP server isn't connected: if you installed the cooklang plugin or extension, check that its `cook` server is running (e.g. `/mcp`) or reinstall it; otherwise add it from https://github.com/cook-md/cook-mcp. Do not audit from guesses about the files.
 
-Use this skill when:
-- Starting a new recipe collection
-- Cleaning up a messy folder structure
-- Preparing for better shopping list generation
-- Standardizing metadata across recipes
+## 1. Survey
 
-## Process
+- `list_recipes` (`kind: "all"`): how many recipes and plans, which folders, loose files at the root, where plans live. `list_recipes` with `kind: "template"` shows report templates.
+- `validate` with no arguments: parse errors and warnings per file, recipe references that don't resolve, and ingredients that have no aisle in `config/aisle.conf`.
 
-### Step 1: Analyze Current State
+Summarise in a few lines: counts per folder, files with errors, broken references, whether `config/aisle.conf` and `config/pantry.conf` exist.
 
-Examine the collection:
-```bash
-find . -name "*.cook" | head -20
+## 2. Folder structure
+
+Suggest a layout only if the current one isn't working; match the existing folder names (e.g. `Plans/` vs `plans/`, `Mains/` vs `Dinner/`) rather than introducing new ones. Common shapes for a new collection:
+
+```
+Breakfast/  Mains/  Sides/  Desserts/  Baking/  Drinks/
+Sauces/          (sub-recipes other recipes reference with @./Sauces/...)
+plans/           (.menu meal plans)
+config/          (aisle.conf, pantry.conf)
+reports/         (.jinja report templates)
 ```
 
-Check for:
-- Folder structure (or lack thereof)
-- Metadata consistency
-- Config files present
+By course is the most common; by cuisine or by diet also work. Folder names double as a course signal for search and meal planning. Recipe images sit beside the recipe with the same name (`Pancakes.jpg`).
 
-### Step 2: Suggest Folder Structure
+cook-mcp has **no move, rename or delete tool**. To reorganise:
 
-Recommend organization by meal type:
-```
-recipes/
-├── breakfast/
-├── lunch/
-├── dinner/
-├── desserts/
-├── snacks/
-├── sides/
-├── sauces/
-├── drinks/
-└── config/
-    ├── aisle.conf
-    └── pantry.conf
-```
+1. Agree the new layout and list every move.
+2. The user moves the files (or you do, with your client's file tools if it has them).
+3. Moved sub-recipes break `@./` references in other files: run `validate` with no arguments, then fix each referencing file with `read_recipe` → corrected full content → `write_recipe`.
+4. Run `validate` with no arguments again until no reference is broken.
 
-Or by cuisine:
-```
-recipes/
-├── italian/
-├── asian/
-├── mexican/
-├── american/
-└── ...
-```
+Never "move" by writing a copy with `write_recipe` and leaving the user with duplicates without saying so.
 
-Ask preference and help reorganize if desired.
+## 3. Metadata audit
 
-### Step 3: Audit Metadata
+Read the recipes in batches with `read_recipe` (for a large library, audit one folder at a time, or ask which part matters). Report a short table of:
 
-Check all recipes for:
-- Missing `title`
-- Missing `servings`
-- Missing `tags`
-- Inconsistent tag naming
-- Deprecated `>>` syntax
+- missing `title` or `servings` (servings drive scaling, plans and nutrition per serving);
+- missing or inconsistent `tags` (`Italian` / `italian` / `italian-food`; `search_recipes` with `tag` matches whole tags, so drift hides recipes);
+- mixed key spellings (`serves` vs `servings`, `time` vs `duration`);
+- any remaining `>>` metadata lines (deprecated; convert to YAML frontmatter).
 
-Report findings and offer to fix.
+Propose one convention (e.g. lowercase, hyphenated tags: `gluten-free`, `one-pot`) and let the user pick. Apply fixes by following the metadata skill: it owns the field list and the bulk-edit workflow (body unchanged, full-file `write_recipe`, confirm first when touching more than about 10 files).
 
-### Step 4: Set Up Configuration
+## 4. Config
 
-**Create aisle.conf:**
-```toml
-[produce]
-tomatoes
-onions
-garlic
-lettuce
-# ... extract from recipes
+- **`config/aisle.conf`** groups shopping lists by store aisle. Start from the ingredients `validate` (no arguments) reports as having no aisle, group them into `[section]` blocks in store order, and save the full file with `write_config` (`path: "config/aisle.conf"`). Format and synonyms: shopping-list skill.
+- **`config/pantry.conf`** lets shopping lists subtract what's in stock and powers `pantry_recipes`. Create it with `write_config` (`path: "config/pantry.conf"`) from the user's staples, then use `pantry_update` for changes. Format: pantry skill.
+- Re-run `validate` with no arguments afterwards to confirm the aisle coverage.
 
-[dairy]
-milk
-butter
-cheese
-eggs
+## Rules
 
-[meat]
-chicken
-beef
-pork
-
-[pantry]
-flour
-sugar
-rice
-pasta
-```
-
-**Create pantry.conf:**
-```toml
-[pantry]
-salt
-pepper
-olive oil
-# ... common staples
-
-[fridge]
-butter
-eggs
-
-[freezer]
-# items you keep stocked
-```
-
-### Step 5: Bulk Updates
-
-Offer to:
-- Add missing servings to all recipes
-- Standardize tag format (lowercase, hyphenated)
-- Add missing source URLs
-- Convert deprecated syntax
-
-## Examples
-
-**User:** "Help me organize my recipes"
-
-**Analysis output:**
-```
-Recipe Collection Analysis
-==========================
-
-Found 47 recipes in 3 directories:
-- ./recipes/ (32 files, no subdirectories)
-- ./old/ (10 files)
-- ./to-try/ (5 files)
-
-Metadata Issues:
-- 12 recipes missing 'servings'
-- 8 recipes missing 'tags'
-- 3 recipes using deprecated >> syntax
-- Inconsistent tags: "Italian" vs "italian" vs "ITALIAN"
-
-Configuration:
-- No aisle.conf found
-- No pantry.conf found
-
-Recommendations:
-1. Create meal-type folders (breakfast, lunch, dinner, etc.)
-2. Add missing servings to 12 recipes
-3. Standardize tags to lowercase
-4. Create aisle.conf with 45 unique ingredients
-5. Set up pantry.conf with common staples
-```
-
-**User:** "Create an aisle.conf for my recipes"
-
-**Generated aisle.conf:**
-```toml
-# Aisle configuration for shopping lists
-# Customize sections to match your grocery store
-
-[produce]
-tomatoes
-onion
-garlic
-bell pepper
-lettuce
-carrots
-potatoes
-lemon
-
-[dairy]
-milk
-butter
-eggs
-parmesan
-mozzarella
-cream
-
-[meat]
-chicken breast
-ground beef
-bacon
-pancetta
-
-[seafood]
-salmon
-shrimp
-
-[bakery]
-bread
-
-[pantry]
-olive oil
-flour
-sugar
-pasta
-rice
-canned tomatoes
-
-[spices]
-salt
-pepper
-oregano
-basil
-cumin
-
-[frozen]
-frozen peas
-```
-
-## Reference
-
-### Recommended Folder Structures
-
-**By meal:**
-```
-breakfast/ lunch/ dinner/ desserts/ snacks/ sides/ sauces/
-```
-
-**By cuisine:**
-```
-italian/ asian/ mexican/ indian/ american/ mediterranean/
-```
-
-**By diet:**
-```
-vegetarian/ vegan/ gluten-free/ keto/ quick-meals/
-```
-
-### Metadata Standards
-
-Recommended fields for every recipe:
-```yaml
----
-title: Recipe Name        # Required
-servings: 4               # Required for scaling
-time: 30 minutes          # Helpful for planning
-tags: [dinner, quick]     # For searching
-source: https://...       # Credit and reference
----
-```
-
-Tag conventions:
-- Lowercase: `italian` not `Italian`
-- Hyphenated: `gluten-free` not `gluten free`
-- Specific: `chicken` not `meat`
-
-### Configuration File Locations
-
-CookCLI looks for config in:
-1. `./config/aisle.conf` (project)
-2. `~/.config/cooklang/aisle.conf` (user)
-3. `/etc/cooklang/aisle.conf` (system)
-
-### Common Ingredients by Aisle
-
-Use as starting point for aisle.conf:
-
-**Produce:** tomatoes, onions, garlic, potatoes, carrots, celery, lettuce, peppers, lemons, limes, herbs
-
-**Dairy:** milk, butter, eggs, cheese, cream, yogurt, sour cream
-
-**Meat:** chicken, beef, pork, bacon, sausage
-
-**Pantry:** flour, sugar, oil, vinegar, pasta, rice, beans, canned tomatoes, broth
-
-**Spices:** salt, pepper, oregano, basil, cumin, paprika, cinnamon
+- Survey and report before changing anything; let the user choose what to fix.
+- Every `write_recipe` replaces a real file: send full content and keep recipe bodies unchanged when only metadata changes.
+- Finish with `validate` (no arguments) and tell the user what changed and what is still open.

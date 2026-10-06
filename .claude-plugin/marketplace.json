@@ -4,12 +4,13 @@
     "name": "Cooklang",
     "url": "https://cooklang.org/"
   },
+  "description": "Cooklang skills and the Cook MCP server for AI agents",
   "plugins": [
     {
       "name": "cooklang",
       "source": "./",
-      "description": "Claude Skills for Cooklang",
-      "version": "1.0.0"
+      "description": "Cooklang recipe skills plus the Cook MCP server for recipes, meal plans, shopping lists and pantry",
+      "version": "2.0.0"
     }
   ]
 }
