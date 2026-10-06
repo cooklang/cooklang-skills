@@ -193,7 +193,7 @@ Full reference at https://nutrition.cook.md/docs/guides/functions.
 | `within_tol(actual, target, tol_pct)` | bool — within `tol_pct` % of target |
 | `compare(actual, target, op)` | bool — `op` is `gte`/`lte`/`eq` |
 | `convert(amount, from, to, ingredient?)` | unit conversion (ingredient needed for volume/count) |
-| `record_check(label, ok)` / `all_checks()` | record and read pass/fail checks (used by `ck` macros) |
+| `record_check(label, ok)` / `all_checks()` | record and read passed/failed checks (used by `ck` macros) |
 
 ## Guardrails
 
