@@ -49,7 +49,7 @@ fi
 loose="$(find "$src/skills" -mindepth 1 -maxdepth 1 -type f)"
 if [[ -n "$loose" ]]; then
   echo "sync-skills: $ref has files directly under skills/ (old flat layout?):" >&2
-  echo "$loose" >&2
+  echo "$loose" | sed "s|^$src/|  |" >&2
   exit 1
 fi
 count=0

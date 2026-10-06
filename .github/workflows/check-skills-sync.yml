@@ -1,0 +1,39 @@
+name: Check skills sync
+
+# skills/ is a copy of cook-md/cook-mcp skills/. Fail when it drifts from
+# cook-mcp main; fix with `scripts/sync-skills.sh main` and commit.
+
+on:
+  pull_request:
+  schedule:
+    - cron: "17 6 * * 1" # Mondays 06:17 UTC
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: cook-mcp ref to compare against
+        default: main
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sync cook-mcp skills into a temp dir
+        env:
+          DEST: ${{ runner.temp }}/skills
+          REF: ${{ inputs.ref || 'main' }}
+        run: scripts/sync-skills.sh "$REF"
+
+      - name: Compare with skills/
+        env:
+          REF: ${{ inputs.ref || 'main' }}
+        run: |
+          if ! diff -ru "${{ runner.temp }}/skills" skills; then
+            echo "::error::skills/ differs from cook-md/cook-mcp@$REF. Run scripts/sync-skills.sh $REF and commit."
+            exit 1
+          fi
+          echo "skills/ matches cook-md/cook-mcp@$REF"
