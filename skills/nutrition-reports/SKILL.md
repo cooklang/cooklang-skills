@@ -1,6 +1,6 @@
 ---
 name: nutrition-reports
-description: Use when the user wants a nutrition or dietitian-style evaluation of a Cooklang recipe (.cook) or meal plan (.menu) - calories, macros, micronutrients, pass/fail checks against targets, exclusions/allergens, a plan's per-day nutrition - or wants to SCREEN recipes that already meet a number ("which of my recipes are over 35% protein?"). Not for changing a recipe or plan to hit targets - that is nutrition-goals.
+description: Use when the user wants a nutrition or dietitian-style evaluation of a Cooklang recipe (.cook) or meal plan (.menu) - calories, macros, micronutrients, passed/failed checks against targets, exclusions/allergens, a plan's per-day nutrition - or wants to SCREEN recipes that already meet a number ("which of my recipes are over 35% protein?"). Not for changing a recipe or plan to hit targets - that is nutrition-goals.
 ---
 
 # Skill: Nutrition Reports
@@ -8,7 +8,7 @@ description: Use when the user wants a nutrition or dietitian-style evaluation o
 **Needs the Cook MCP server** (tools like `render_report` and `read_recipe`). If these tools are missing, the Cook MCP server isn't connected: if you installed the cooklang plugin or extension, check that its `cook` server is running (e.g. `/mcp`) or reinstall it; otherwise add it from https://github.com/cook-md/cook-mcp. Never estimate nutrition from your own knowledge instead.
 
 Use when the user wants a **nutrition or dietitian-style evaluation** of a recipe or
-meal plan — calories/macros/micronutrients, pass/fail checks against targets, exclusions
+meal plan — calories/macros/micronutrients, passed/failed checks against targets, exclusions
 or allergens, or aggregating nutrition across a `.menu` plan. Backed by the **Cook
 nutrition service**, called through the `render_report` tool.
 
@@ -28,7 +28,7 @@ the error. The direct nutrition tools (`get_nutrition`, `aggregate_nutrition`, `
 Nutrition reports are Jinja2 templates rendered with `render_report` (it never edits
 files). The template calls nutrition functions (below); the service resolves each
 ingredient. `render_report` returns `{ rendered, checks, resolve_failures }`:
-`checks` are the pass/fail checks the template recorded, `resolve_failures` the
+`checks` are the passed/failed checks the template recorded, `resolve_failures` the
 ingredients the service couldn't resolve, each with an error code, message and
 `suggestions`.
 
@@ -82,7 +82,7 @@ three-dinner question into a hundred tool calls. Work in three passes:
    same small template for each candidate (in parallel if your client allows).
 
 Emit one machine-readable line per candidate (`NAME | kcal | protein_g |
-pct_protein | PASS/FAIL`) so each output is a single line. Present the survivors,
+pct_protein | OK/FAILED`) so each output is a single line. Present the survivors,
 then hand off — meal-planning to build a `.menu` from them, nutrition-goals only
 if a chosen recipe has to be *changed* to clear the bar.
 
@@ -197,7 +197,7 @@ https://nutrition.cook.md/docs/guides/functions):
 | `convert(amount, from, to, ingredient?)` | unit conversion (ingredient needed for volume/count) |
 | `compare(actual, target, op)` | bool — `op` is `gte`/`lte`/`eq` |
 | `within_tol(actual, target, tol_pct)` | bool — within `tol_pct` % of target |
-| `record_check(label, ok)` / `all_checks()` / `failed_checks()` | record and read pass/fail checks |
+| `record_check(label, ok)` / `all_checks()` / `failed_checks()` | record and read passed/failed checks |
 | `matched_exclusions(ingredients, exclusions)` / `unresolved_exclusions(...)` | exclusion resolution |
 
 Check macros — `{% import "ck" as ck %}`, then each macro records a check and renders a line:
@@ -225,7 +225,7 @@ tool sums a hand-made list.
 
 ```jinja2
 {% import "ck" as ck %}
-{# Targets inline; or pass client_profile_path and use client.targets. #}
+{# Targets inline; or set client_profile_path and use client.targets. #}
 {% set targets = {
   "energy_kcal": {"min": 1800, "max": 2200},
   "protein_g":   {"min": 75},
@@ -258,7 +258,7 @@ tool sums a hand-made list.
 
 When the user wants nutrients framed against a daily target, use `dv_percent` (or
 `reference_intake` for the raw figure) instead of inventing reference numbers. The
-standard defaults to `"fda"`; pass `"eu"`/`"uk"` for European labels. A nutrient with
+standard defaults to `"fda"`; use `"eu"`/`"uk"` for European labels. A nutrient with
 no published DV returns `undefined` — pre-assign the result and guard with `is defined`
 so the row is skipped (piping `undefined` through `| round` raises a template error):
 

@@ -32,4 +32,4 @@ Use when the user wants a recipe's quantities for a different number of servings
 
 - Scaling to show amounts does not touch the file. Only change the saved recipe if the user asks to make the new size permanent; then follow cooklang-editing: update every quantity and `servings` in the frontmatter, `validate` the content, save with `write_recipe` (full file).
 - For a meal plan, scale each reference inside the `.menu` (`@./Dinner/Chili{6%servings}`); see the meal-planning skill.
-- For a shopping list at a different size, pass `"<path>:<factor>"` to `shopping_list` rather than scaling and summing yourself (shopping-list skill).
+- For a shopping list at a different size, give `"<path>:<factor>"` to `shopping_list` rather than scaling and summing yourself (shopping-list skill).

@@ -57,12 +57,12 @@ Do NOT put `\` on the last line of a block, and do not backslash a line followed
 - Use `@./path{N%servings}` references to existing recipes (path from the collection root, no `.cook` extension) rather than inlining recipe steps into the menu.
 - A recipe with no numeric `servings` can't be scaled by `{N%servings}` — the number silently becomes a plain multiplier (×N) — reason: a 2-portion recipe referenced as `{3%servings}` gets tripled, which inflates the shopping list and every nutrition report. Read its body, judge how many portions it makes, and write a bare factor instead (`{1.5}` for 3 people from a 2-portion recipe). In your reply, name these recipes and offer to add `servings` to them (metadata skill) so future plans scale exactly.
 - Save menus into a dedicated `menus/` or `plans/` folder unless the user's layout says otherwise.
-- For the shopping list, pass the saved plan to `shopping_list`; it follows the references, merges duplicates and subtracts the pantry.
+- For the shopping list, give the saved plan to `shopping_list`; it follows the references, merges duplicates and subtracts the pantry.
 - To *evaluate* a plan's nutrition (per-day calories/macros against targets), follow the nutrition-reports skill. To *change* the plan to hit targets, follow nutrition-goals.
 
 ## Do not skip the checks
 
 | Excuse | Rebuttal |
 |--------|----------|
-| "That recipe is probably in the collection." | Reference only paths you saw in `list_recipes` / `search_recipes`. `write_menu` refuses unresolved references; never pass `force: true` to get past one. |
+| "That recipe is probably in the collection." | Reference only paths you saw in `list_recipes` / `search_recipes`. `write_menu` refuses unresolved references; never set `force: true` to get past one. |
 | "The plan looks complete, I'll describe it in chat." | Save it with `write_menu` and say where — a plan in chat is not in the user's collection. |

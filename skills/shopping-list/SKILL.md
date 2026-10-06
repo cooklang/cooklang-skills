@@ -15,8 +15,8 @@ Use the `shopping_list` tool. It does the arithmetic: merges duplicate ingredien
 
 1. Find the recipes or plans: `search_recipes` when the user names dishes, `list_recipes` (`kind: "menu"` for plans) to browse. Never reference a recipe that is not in the collection.
 2. Call `shopping_list` with `recipes`: paths exactly as those tools returned them. Append `:N` to scale one entry, e.g. `"Dinner/Pasta.cook:2"` for a double batch. A .menu plan is one entry; its own `{N%servings}` references already set the amounts.
-3. Pantry: by default items in stock are subtracted. Pass `ignore_pantry: true` when the user wants the full list (e.g. shopping for someone else's kitchen).
-4. Format: the default JSON is grouped by aisle — present it as a grouped checklist. Pass `format: "markdown"` when the user wants text to paste or print.
+3. Pantry: by default items in stock are subtracted. Set `ignore_pantry: true` when the user wants the full list (e.g. shopping for someone else's kitchen).
+4. Format: the default JSON is grouped by aisle — present it as a grouped checklist. Set `format: "markdown"` when the user wants text to paste or print.
 5. Report `diagnostics` that matter: references that didn't resolve, ingredients that couldn't be merged because their units differ.
 
 ## Aisle grouping

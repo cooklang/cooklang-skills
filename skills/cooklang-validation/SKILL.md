@@ -45,5 +45,5 @@ These rules are for .cook recipes. Menu files (.menu) share most syntax but are 
 | Excuse | Rebuttal |
 |--------|----------|
 | "I only pointed out the errors, that's enough." | If the user wanted a fix, validate the corrected content and save it with `write_recipe`. Listing errors does not change the file. |
-| "`validate` passed, so the recipe is fine." | Rules 1, 2, 3, 5, 6 and 7 pass `validate`; check them by eye. |
+| "`validate` passed, so the recipe is fine." | Rules 1, 2, 3, 5, 6 and 7 get through `validate`; check them by eye. |
 | "The recipe already has an ingredients list, keep it." | A separate ingredient list is the violation (rule 1). Remove it and put the quantities inline; do not preserve it. |

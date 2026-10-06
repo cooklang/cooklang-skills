@@ -36,7 +36,7 @@ From a description, a family recipe from memory, or a dish the user names:
 - Recipe images live beside the file with a matching name (`Baked Potato.jpg`), or as step images (`Baked Potato.3.jpg`); see the syntax reference under Images.
 - Match the surrounding file's conventions (units, casing, section style) — reason: a recipe that mixes styles is harder for the user to maintain.
 - Touch only the file the task names. If a change demonstrably needs another file (e.g. a referenced sub-recipe), name that file and explain why before editing it.
-- Do not pass `force: true` to `write_recipe` to get past validation errors; fix them. Use it only when the user explicitly wants a file saved as-is.
+- Do not set `force: true` to `write_recipe` to get past validation errors; fix them. Use it only when the user explicitly wants a file saved as-is.
 
 ## Do not skip the checks
 
