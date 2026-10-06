@@ -1,0 +1,24 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "cooklang",
+  "version": "2.0.0",
+  "description": "Cooklang recipe skills plus the Cook MCP server: write, validate, search and scale .cook recipes, plan meals in .menu files, build shopping lists, track a pantry, import recipes and export them. Works locally on your recipe folder; nutrition and photo import need Cook Basic or Pro.",
+  "author": {
+    "name": "Cooklang",
+    "url": "https://cooklang.org/"
+  },
+  "homepage": "https://github.com/cook-md/cook-mcp",
+  "repository": "https://github.com/cooklang/cooklang-skills",
+  "license": "MIT",
+  "keywords": [
+    "cooklang",
+    "recipes",
+    "cooking",
+    "mcp",
+    "meal-planning",
+    "shopping-list",
+    "pantry",
+    "nutrition",
+    "skills"
+  ]
+}
