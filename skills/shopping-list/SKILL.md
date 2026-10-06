@@ -5,7 +5,7 @@ description: Use when the user asks for a shopping or grocery list from Cooklang
 
 # Skill: shopping-list
 
-**Needs the Cook MCP server.** If tools like `shopping_list` and `search_recipes` are not available in this session, stop and tell the user to add the server: `claude mcp add cook -- npx -y @cookmd/mcp`, or the JSON config at https://github.com/cook-md/cook-mcp. Never sum quantities by hand instead.
+**Needs the Cook MCP server** (tools like `shopping_list` and `search_recipes`). If these tools are missing, the Cook MCP server isn't connected: if you installed the cooklang plugin or extension, check that its `cook` server is running (e.g. `/mcp`) or reinstall it; otherwise add it from https://github.com/cook-md/cook-mcp. Never sum quantities by hand instead.
 
 Use when the user asks for a shopping or grocery list from recipes or a meal plan.
 

@@ -5,7 +5,7 @@ description: Use when the user wants a nutrition or dietitian-style evaluation o
 
 # Skill: Nutrition Reports
 
-**Needs the Cook MCP server.** If tools like `render_report` and `read_recipe` are not available in this session, stop and tell the user to add the server: `claude mcp add cook -- npx -y @cookmd/mcp`, or the JSON config at https://github.com/cook-md/cook-mcp. Never estimate nutrition from your own knowledge instead.
+**Needs the Cook MCP server** (tools like `render_report` and `read_recipe`). If these tools are missing, the Cook MCP server isn't connected: if you installed the cooklang plugin or extension, check that its `cook` server is running (e.g. `/mcp`) or reinstall it; otherwise add it from https://github.com/cook-md/cook-mcp. Never estimate nutrition from your own knowledge instead.
 
 Use when the user wants a **nutrition or dietitian-style evaluation** of a recipe or
 meal plan — calories/macros/micronutrients, pass/fail checks against targets, exclusions

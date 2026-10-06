@@ -7,11 +7,11 @@ description: Use when the user wants to find recipes in their Cooklang collectio
 
 Use when the user wants to find recipes in their collection.
 
-**Needs the Cook MCP server.** If tools like `search_recipes` and `read_recipe` are not available in this session, stop and tell the user to add the server: `claude mcp add cook -- npx -y @cookmd/mcp`, or the JSON config at https://github.com/cook-md/cook-mcp. Do not guess at what the collection holds.
+**Needs the Cook MCP server** (tools like `search_recipes` and `read_recipe`). If these tools are missing, the Cook MCP server isn't connected: if you installed the cooklang plugin or extension, check that its `cook` server is running (e.g. `/mcp`) or reinstall it; otherwise add it from https://github.com/cook-md/cook-mcp. Do not guess at what the collection holds.
 
 ## The tools
 
-- `search_recipes` — `query` and/or `tag`. Returns `hits` (`path`, `name`), best match first.
+- `search_recipes` — `query` and/or `tag`. Returns `hits` (`path`, `name`): best match first when there is a `query`; a `tag`-only search is sorted by path.
   - **Every word in `query` must match** (AND), case-insensitively, as a substring of the file name or the file's text (frontmatter, ingredients, steps, notes). `chicken rice` finds recipes with both; `tomato` also matches `tomatoes`.
   - `tag` keeps only files whose frontmatter `tags` list contains that tag (case-insensitive, whole tag). `query` may be empty when `tag` is set.
 - `list_recipes` — browse instead of search: `dir` for one folder (folder names are often the course: `Breakfast/`, `Desserts/`), `kind` `"recipe"`, `"menu"` or `"all"`.

@@ -5,7 +5,7 @@ description: Use when adding, normalizing, or fixing YAML frontmatter in Cooklan
 
 # Skill: metadata
 
-**Needs the Cook MCP server.** If tools like `read_recipe` and `write_recipe` are not available in this session, stop and tell the user to add the server: `claude mcp add cook -- npx -y @cookmd/mcp`, or the JSON config at https://github.com/cook-md/cook-mcp. Do not rewrite files without them.
+**Needs the Cook MCP server** (tools like `read_recipe` and `write_recipe`). If these tools are missing, the Cook MCP server isn't connected: if you installed the cooklang plugin or extension, check that its `cook` server is running (e.g. `/mcp`) or reinstall it; otherwise add it from https://github.com/cook-md/cook-mcp. Do not rewrite files without them.
 
 Use when adding, normalizing, or fixing recipe/menu metadata (YAML frontmatter): titles, tags, source/author, servings/yield, times, diet, locale, images, or bulk metadata changes across a library.
 

@@ -1,13 +1,13 @@
 ---
 name: organize-collection
-description: Use when the user wants to organize or tidy a Cooklang recipe collection - folder structure, a metadata consistency audit across .cook files (missing servings, inconsistent tags), setting up config/aisle.conf or config/pantry.conf, or a health check of the whole library.
+description: Use when the user wants whole-library work on a Cooklang recipe collection - organizing or tidying the folder structure, a metadata consistency audit across all .cook files (missing servings, inconsistent tags), first-time setup of config/aisle.conf and config/pantry.conf, or a health check of everything. For a single aisle or pantry tweak use shopping-list or pantry.
 ---
 
 # Skill: organize-collection
 
 Use when the user wants their recipe collection structured, audited or set up: folders, consistent metadata, shopping-list and pantry config, or a whole-library check.
 
-**Needs the Cook MCP server.** If tools like `list_recipes` and `validate` are not available in this session, stop and tell the user to add the server: `claude mcp add cook -- npx -y @cookmd/mcp`, or the JSON config at https://github.com/cook-md/cook-mcp. Do not audit from guesses about the files.
+**Needs the Cook MCP server** (tools like `list_recipes` and `validate`). If these tools are missing, the Cook MCP server isn't connected: if you installed the cooklang plugin or extension, check that its `cook` server is running (e.g. `/mcp`) or reinstall it; otherwise add it from https://github.com/cook-md/cook-mcp. Do not audit from guesses about the files.
 
 ## 1. Survey
 
@@ -18,7 +18,7 @@ Summarise in a few lines: counts per folder, files with errors, broken reference
 
 ## 2. Folder structure
 
-Suggest a layout only if the current one isn't working; match what the user already does. Common shapes:
+Suggest a layout only if the current one isn't working; match the existing folder names (e.g. `Plans/` vs `plans/`, `Mains/` vs `Dinner/`) rather than introducing new ones. Common shapes for a new collection:
 
 ```
 Breakfast/  Mains/  Sides/  Desserts/  Baking/  Drinks/

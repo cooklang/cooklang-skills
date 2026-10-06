@@ -5,7 +5,7 @@ description: Use when the user wants to write or run a custom Jinja report templ
 
 # Skill: Report Authoring
 
-**Needs the Cook MCP server.** If tools like `render_report` and `write_config` are not available in this session, stop and tell the user to add the server: `claude mcp add cook -- npx -y @cookmd/mcp`, or the JSON config at https://github.com/cook-md/cook-mcp. Do not compute report values by hand instead.
+**Needs the Cook MCP server** (tools like `render_report` and `write_config`). If these tools are missing, the Cook MCP server isn't connected: if you installed the cooklang plugin or extension, check that its `cook` server is running (e.g. `/mcp`) or reinstall it; otherwise add it from https://github.com/cook-md/cook-mcp. Do not compute report values by hand instead.
 
 Author and run **Jinja2 report templates** over the user's recipes with the
 `render_report` tool — or reuse a saved one — then answer from the output or

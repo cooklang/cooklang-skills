@@ -5,7 +5,7 @@ description: Use when building or editing a Cooklang meal plan (.menu file), wee
 
 # Skill: meal-planning
 
-**Needs the Cook MCP server.** If tools like `list_recipes` and `write_menu` are not available in this session, stop and tell the user to add the server: `claude mcp add cook -- npx -y @cookmd/mcp`, or the JSON config at https://github.com/cook-md/cook-mcp. Do not plan from recipes you have not seen in the collection.
+**Needs the Cook MCP server** (tools like `list_recipes` and `write_menu`). If these tools are missing, the Cook MCP server isn't connected: if you installed the cooklang plugin or extension, check that its `cook` server is running (e.g. `/mcp`) or reinstall it; otherwise add it from https://github.com/cook-md/cook-mcp. Do not plan from recipes you have not seen in the collection.
 
 Use when building or editing a .menu file or a multi-day meal plan. The file format is in the `cooklang://menu-format` resource.
 

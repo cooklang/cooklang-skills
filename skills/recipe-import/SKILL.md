@@ -5,7 +5,7 @@ description: Use when bringing a recipe into the Cooklang collection from a URL,
 
 # Skill: recipe-import
 
-**Needs the Cook MCP server.** If tools like `import_recipe` and `validate` are not available in this session, stop and tell the user to add the server: `claude mcp add cook -- npx -y @cookmd/mcp`, or the JSON config at https://github.com/cook-md/cook-mcp. Do not copy a recipe out of a page by hand without them.
+**Needs the Cook MCP server** (tools like `import_recipe` and `validate`). If these tools are missing, the Cook MCP server isn't connected: if you installed the cooklang plugin or extension, check that its `cook` server is running (e.g. `/mcp`) or reinstall it; otherwise add it from https://github.com/cook-md/cook-mcp. Do not copy a recipe out of a page by hand without them.
 
 Use when bringing a recipe in from a URL, photos, or pasted text.
 

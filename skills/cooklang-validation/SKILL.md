@@ -5,7 +5,7 @@ description: Use when checking or validating Cooklang - one .cook recipe, a fold
 
 # Skill: cooklang-validation
 
-**Needs the Cook MCP server.** If tools like `validate` and `read_recipe` are not available in this session, stop and tell the user to add the server: `claude mcp add cook -- npx -y @cookmd/mcp`, or the JSON config at https://github.com/cook-md/cook-mcp. Do not judge validity by eye alone instead.
+**Needs the Cook MCP server** (tools like `validate` and `read_recipe`). If these tools are missing, the Cook MCP server isn't connected: if you installed the cooklang plugin or extension, check that its `cook` server is running (e.g. `/mcp`) or reinstall it; otherwise add it from https://github.com/cook-md/cook-mcp. Do not judge validity by eye alone instead.
 
 Use when checking or validating a .cook recipe for syntax errors, or when asked to fix or clean up Cooklang. The cooklang-editing and recipe-import skills also self-check against these rules before they save a file.
 

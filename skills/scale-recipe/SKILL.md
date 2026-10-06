@@ -7,7 +7,7 @@ description: Use when the user wants a Cooklang recipe (.cook) for more or fewer
 
 Use when the user wants a recipe's quantities for a different number of servings or batches.
 
-**Needs the Cook MCP server.** If tools like `read_recipe` and `validate` are not available in this session, stop and tell the user to add the server: `claude mcp add cook -- npx -y @cookmd/mcp`, or the JSON config at https://github.com/cook-md/cook-mcp. Do not work out scaled amounts by hand instead.
+**Needs the Cook MCP server** (tools like `read_recipe` and `validate`). If these tools are missing, the Cook MCP server isn't connected: if you installed the cooklang plugin or extension, check that its `cook` server is running (e.g. `/mcp`) or reinstall it; otherwise add it from https://github.com/cook-md/cook-mcp. Do not work out scaled amounts by hand instead.
 
 ## Workflow
 
@@ -16,8 +16,8 @@ Use when the user wants a recipe's quantities for a different number of servings
    - "For 6 people": read the recipe once (no `scale`) and take `servings` from its metadata; factor = 6 / servings (e.g. 6 / 4 = 1.5).
    - "Double", "half", "3 loaves of a 1-loaf recipe": the factor is given.
    - No numeric `servings` and the user asked for a head count: look at the body, judge how many portions it makes, state that assumption, then pick the factor. Offer to add `servings` (metadata skill) so it scales exactly next time.
-3. Call `read_recipe` with `path` and `scale`. Every quantity in the parsed `recipe` (`ingredients[].quantity`, and the step text built from it) is already scaled, and `recipe.metadata.map.servings` shows the new count. Use those numbers; do not multiply anything yourself.
-4. Present the scaled ingredient list (original → scaled where helpful, original amounts are in `source`) and, if the user is cooking from it, the steps with the scaled amounts.
+3. Call `read_recipe` with `path` and `scale`. Every quantity in the parsed `recipe` (`ingredients[].quantity`, `timers`) is already scaled, and `recipe.metadata.map.servings` shows the new count. Use those numbers; do not multiply anything yourself. Steps come back as `items` that point at ingredients by index, not as text.
+4. Present the scaled ingredient list (original → scaled where helpful, original amounts are in `source`). If the user is cooking from it and wants the steps with amounts filled in, render them with `render_report` (same `input_path` and `scale`, a template that loops over `sections`; the export-recipe skill has one) rather than rebuilding sentences by hand.
 5. Point out what the numbers can't tell them (below).
 
 ## What scaling does and doesn't cover
