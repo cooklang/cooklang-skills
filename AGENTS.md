@@ -9,7 +9,7 @@ This folder may hold recipes written in [Cooklang](https://cooklang.org), a plai
 
 ## Use the Cook MCP server
 
-The `cook` MCP server (`npx -y @cookmd/mcp`) reads, searches, validates and writes these files. Prefer its tools over editing by hand or doing arithmetic yourself:
+The `cook` MCP server (`npx -y @cookmd/mcp@0.2.3`) reads, searches, validates and writes these files. Prefer its tools over editing by hand or doing arithmetic yourself:
 
 - read and find: `list_recipes`, `read_recipe` (with scaling), `search_recipes`
 - check and save: `validate`, then `write_recipe` / `write_menu` / `write_config` (writes are validated and stay inside the recipe folder)

@@ -9,7 +9,7 @@ This repo packages two things for every agent client:
 
 Everything runs locally and is free, with no account. Nutrition and importing from photos or social links use cook.md and need **Cook Basic** or **Cook Pro**.
 
-The server runs through `npx`, so you need Node.js. Builds exist for macOS (arm64, x64) and Linux (x64, arm64). There are no Windows builds yet. The plugin setups below need `@cookmd/mcp` 0.2.2 or newer, which `npx -y` fetches.
+The server runs through `npx`, so you need Node.js. Builds exist for macOS (arm64, x64) and Linux (x64, arm64). There are no Windows builds yet. The plugin manifests pin `@cookmd/mcp@0.2.3`; the snippets for other clients below use the latest release. Plugin setups need 0.2.2 or newer.
 
 ## Install
 
