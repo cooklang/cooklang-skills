@@ -1,5 +1,6 @@
 name: Check skills sync
 
+# Also checks the @cookmd/mcp launcher pin is consistent (and, weekly, current).
 # skills/ is a copy of cook-md/cook-mcp skills/. Fail when it drifts from
 # cook-mcp main; fix with `scripts/sync-skills.sh main` and commit.
 
@@ -37,3 +38,42 @@ jobs:
             exit 1
           fi
           echo "skills/ matches cook-md/cook-mcp@$REF"
+
+  pin:
+    name: Check @cookmd/mcp pin
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pins agree across manifests
+        run: |
+          # Every manifest that launches the server must pin the same version.
+          FILES=".claude-plugin/plugin.json mcp.json gemini-extension.json AGENTS.md GEMINI.md"
+          PINS="$(grep -ho '@cookmd/mcp@[0-9][0-9A-Za-z.+-]*' $FILES | sort -u)"
+          echo "pins found: $PINS"
+          if [ "$(echo "$PINS" | wc -l)" -ne 1 ] || [ -z "$PINS" ]; then
+            echo "::error::@cookmd/mcp pins differ or are missing across: $FILES"
+            exit 1
+          fi
+          for f in $FILES; do
+            grep -q '@cookmd/mcp@[0-9]' "$f" || { echo "::error::$f has no pinned @cookmd/mcp@X"; exit 1; }
+            grep -n '@cookmd/mcp' "$f" | grep -v '@cookmd/mcp@[0-9]' && { echo "::error::$f has an unpinned launcher"; exit 1; } || true
+          done
+          # Plugin version must match across manifests too.
+          V="$(jq -r .version .claude-plugin/plugin.json)"
+          for f in plugin.json gemini-extension.json; do
+            [ "$(jq -r .version $f)" = "$V" ] || { echo "::error::$f version != $V"; exit 1; }
+          done
+          [ "$(jq -r '.plugins[0].version' .claude-plugin/marketplace.json)" = "$V" ] \
+            || { echo "::error::marketplace.json version != $V"; exit 1; }
+
+      - name: Pin is not behind npm latest (weekly run only)
+        if: github.event_name == 'schedule'
+        run: |
+          PIN="$(grep -ho '@cookmd/mcp@[0-9][0-9A-Za-z.+-]*' mcp.json | head -1 | cut -d@ -f3)"
+          LATEST="$(npm view @cookmd/mcp version)"
+          if [ "$PIN" != "$LATEST" ]; then
+            echo "::error::pinned @cookmd/mcp@$PIN is behind npm latest $LATEST. Bump the pin in the manifests, AGENTS.md and GEMINI.md, and the plugin version."
+            exit 1
+          fi
+          echo "pin $PIN is current"

@@ -1,11 +1,11 @@
 {
   "name": "cooklang",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Cooklang recipe skills plus the Cook MCP server: recipes, meal plans, shopping lists, pantry, import and export. Local and free; nutrition and photo import need Cook Basic or Pro.",
   "mcpServers": {
     "cook": {
       "command": "npx",
-      "args": ["-y", "@cookmd/mcp"],
+      "args": ["-y", "@cookmd/mcp@0.2.3"],
       "env": {
         "COOK_RECIPES_DIR": "${workspacePath}"
       }

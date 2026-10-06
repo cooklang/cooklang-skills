@@ -10,7 +10,7 @@
       "name": "cooklang",
       "source": "./",
       "description": "Cooklang recipe skills plus the Cook MCP server for recipes, meal plans, shopping lists and pantry",
-      "version": "2.0.0"
+      "version": "2.0.1"
     }
   ]
 }
