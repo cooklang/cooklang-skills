@@ -1,141 +1,35 @@
 ---
 name: scale-recipe
-description: Adjust recipe servings and display scaled ingredient quantities
+description: Use when the user wants a Cooklang recipe (.cook) for more or fewer people - "double this", "halve the cake", "scale the carbonara for 6", "how much flour for 3 loaves". Shows scaled quantities without changing the file; changing the saved recipe is cooklang-editing.
 ---
 
-# Scale Recipe
+# Skill: scale-recipe
 
-## Overview
+Use when the user wants a recipe's quantities for a different number of servings or batches.
 
-Display a recipe with adjusted serving sizes. Shows original vs scaled quantities for easy comparison.
+**Needs the Cook MCP server.** If tools like `read_recipe` and `validate` are not available in this session, stop and tell the user to add the server: `claude mcp add cook -- npx -y @cookmd/mcp`, or the JSON config at https://github.com/cook-md/cook-mcp. Do not work out scaled amounts by hand instead.
 
-Use this skill when:
-- Cooking for more or fewer people
-- Halving or doubling a recipe
-- Converting between serving sizes
+## Workflow
 
-## Process
+1. Find the recipe with `search_recipes` (or `list_recipes`) and use the path exactly as returned. Never scale a recipe the collection doesn't have.
+2. Work out the factor. `read_recipe` takes `scale` as a **factor** (2 doubles, 0.5 halves), not a target number of servings.
+   - "For 6 people": read the recipe once (no `scale`) and take `servings` from its metadata; factor = 6 / servings (e.g. 6 / 4 = 1.5).
+   - "Double", "half", "3 loaves of a 1-loaf recipe": the factor is given.
+   - No numeric `servings` and the user asked for a head count: look at the body, judge how many portions it makes, state that assumption, then pick the factor. Offer to add `servings` (metadata skill) so it scales exactly next time.
+3. Call `read_recipe` with `path` and `scale`. Every quantity in the parsed `recipe` (`ingredients[].quantity`, and the step text built from it) is already scaled, and `recipe.metadata.map.servings` shows the new count. Use those numbers; do not multiply anything yourself.
+4. Present the scaled ingredient list (original → scaled where helpful, original amounts are in `source`) and, if the user is cooking from it, the steps with the scaled amounts.
+5. Point out what the numbers can't tell them (below).
 
-### Step 1: Identify Recipe
+## What scaling does and doesn't cover
 
-Ask: "Which recipe do you want to scale?"
+- **Fixed quantities** written `{=…}` (e.g. `@salt{=1%pinch}`) do not scale. Find them in `source` and say so ("salt stays 1 pinch"). `validate` warns "Unnecessary scaling lock modifier" on them; that is a parser quirk, not a problem.
+- **Unitless counts** scale too: 3 eggs × 1.5 = 4.5 eggs. Round to something cookable and say what you rounded (4 large or 5 small eggs).
+- **Recipe references** (`@./Sauces/Pesto{150%g}`) scale as one line. Their own ingredients are not expanded by `read_recipe`; for the full scaled ingredient list across sub-recipes, call `shopping_list` with `recipes: ["<path>:<factor>"]` (e.g. `"Dinner/Lasagne.cook:1.5"`), which follows references.
+- **Timers and cookware** don't change. Say when it matters: a doubled stew needs a bigger pot, a doubled cake needs two tins or a longer bake, roasting more food crowds the pan.
+- **Baking and seasoning** are less linear than the arithmetic. Leavening (baking soda, yeast) and salt are safest scaled modestly and adjusted; beyond about 2× suggest cooking in batches.
 
-### Step 2: Determine Scale Factor
+## Rules
 
-Ask: "How many servings do you need?"
-- Or: "What scale factor?" (2 = double, 0.5 = half)
-
-Calculate factor: `new_servings / original_servings`
-
-### Step 3: Display Scaled Recipe
-
-**Using CookCLI:**
-```bash
-cook recipe "Recipe.cook" --scale 2
-```
-
-**Or with colon notation:**
-```bash
-cook recipe "Recipe.cook:2"
-```
-
-### Step 4: Highlight Important Notes
-
-Warn about:
-- **Fixed quantities** (marked with `=`) - These don't scale
-- **Timing** - Cooking times may need adjustment for larger batches
-- **Equipment** - May need larger pots/pans
-
-## Examples
-
-**User:** "Scale the pasta recipe for 8 people"
-
-**Original recipe (serves 4):**
-```cooklang
----
-title: Spaghetti Carbonara
-servings: 4
----
-
-Cook @spaghetti{400%g} in boiling water.
-Fry @pancetta{150%g} until crispy.
-Mix @eggs{4} with @parmesan{100%g}.
-Season with @black pepper{} and @salt{=1%pinch}.
-```
-
-**Run:**
-```bash
-cook recipe "Spaghetti Carbonara.cook" --scale 2
-```
-
-**Scaled output (serves 8):**
-```
-Spaghetti Carbonara (scaled to 8 servings)
-
-Ingredients:
-- spaghetti: 800g (was 400g)
-- pancetta: 300g (was 150g)
-- eggs: 8 (was 4)
-- parmesan: 200g (was 100g)
-- black pepper: to taste
-- salt: 1 pinch (FIXED - doesn't scale)
-
-Steps:
-[Recipe steps with scaled quantities inline]
-```
-
-**User:** "Halve the cake recipe"
-
-**Run:**
-```bash
-cook recipe "Chocolate Cake.cook" --scale 0.5
-```
-
-## Reference
-
-### Scaling Commands
-
-```bash
-# Double
-cook recipe "Recipe.cook" --scale 2
-cook recipe "Recipe.cook:2"
-
-# Half
-cook recipe "Recipe.cook" --scale 0.5
-cook recipe "Recipe.cook:0.5"
-
-# Specific servings (if original is 4, this makes 6)
-cook recipe "Recipe.cook" --scale 1.5
-
-# In shopping list
-cook shopping-list "Recipe.cook:2"
-```
-
-### Fixed Quantities
-
-Some ingredients shouldn't scale. Mark with `=`:
-
-```cooklang
-@salt{=1%tsp}        -- stays 1 tsp regardless of scale
-@baking soda{=1%tsp} -- leavening is chemistry, be careful
-@vanilla{=1%tsp}     -- flavor extracts often don't scale linearly
-```
-
-### Scaling Considerations
-
-| Item | Scales? | Notes |
-|------|---------|-------|
-| Main ingredients | Yes | Meat, vegetables, pasta |
-| Liquids | Yes | But may need adjustment |
-| Seasonings | Partially | Start with less, adjust to taste |
-| Leavening | Carefully | Baking soda/powder - use formulas |
-| Cooking time | No | But larger batches may need more |
-| Pan size | No | May need multiple batches |
-
-### Tips
-
-- Doubling is usually safe
-- Halving works well for most recipes
-- Beyond 2x, consider cooking in batches
-- Baking is more sensitive to scaling than cooking
-- Always taste and adjust seasonings
+- Scaling to show amounts does not touch the file. Only change the saved recipe if the user asks to make the new size permanent; then follow cooklang-editing: update every quantity and `servings` in the frontmatter, `validate` the content, save with `write_recipe` (full file).
+- For a meal plan, scale each reference inside the `.menu` (`@./Dinner/Chili{6%servings}`); see the meal-planning skill.
+- For a shopping list at a different size, pass `"<path>:<factor>"` to `shopping_list` rather than scaling and summing yourself (shopping-list skill).
