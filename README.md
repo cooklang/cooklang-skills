@@ -9,23 +9,29 @@ This repo packages two things for every agent client:
 
 Everything runs locally and is free, with no account. Nutrition and importing from photos or social links use cook.md and need **Cook Basic** or **Cook Pro**.
 
-The server runs through `npx`, so you need Node.js. Builds exist for macOS (arm64, x64) and Linux (x64, arm64). There are no Windows builds yet.
+The server runs through `npx`, so you need Node.js. Builds exist for macOS (arm64, x64) and Linux (x64, arm64). There are no Windows builds yet. The plugin setups below need `@cookmd/mcp` 0.2.2 or newer, which `npx -y` fetches.
 
 ## Install
 
 | Client | Skills | Cook MCP server |
 |--------|--------|-----------------|
 | [Claude Code](#claude-code) | plugin | plugin |
-| [Codex](#codex) | plugin | `codex mcp add` |
+| [Codex](#codex) | plugin | plugin, plus `COOK_RECIPES_DIR` via `codex mcp add` |
 | [Gemini CLI](#gemini-cli) | extension | extension |
-| [Cursor](#cursor) | `skills/` copy | install link |
-| [VS Code / GitHub Copilot](#vs-code--github-copilot) | plugin | install link |
+| [Cursor](#cursor) | plugin or `skills/` copy | plugin, or install link |
+| [VS Code / GitHub Copilot](#vs-code--github-copilot) | plugin | plugin, or install link |
 | [Claude Desktop and other MCP clients](#claude-desktop-and-other-mcp-clients) | | JSON config |
 | [Any agent, skills only](#skills-only) | `npx skills add` | |
 
 ### The recipe folder
 
-The server works on one folder of recipes: `COOK_RECIPES_DIR` if set, otherwise the folder the client starts it in. The configs below point it at your open project or workspace, so open your recipe folder in the client. If the server starts in `/` or your home folder, recipe tools reply that no folder is set; set `COOK_RECIPES_DIR` to an absolute path in the server's config.
+The server works on one folder of recipes. It uses, in order:
+
+1. `COOK_RECIPES_DIR`, if set in the server's config.
+2. The workspace folder the client reports (MCP roots), which is the project you have open.
+3. The folder the client started it in.
+
+It ignores `/`, your home folder and plugin install folders (a plugin's server may be started inside the plugin's own folder). If nothing usable is left, recipe tools reply that no recipe folder is set and say why; set `COOK_RECIPES_DIR` to an absolute path in the server's config. So open your recipe folder in the client, or set the variable.
 
 ### Claude Code
 
@@ -38,15 +44,18 @@ The plugin adds the skills and starts the Cook server with your Claude Code proj
 
 ### Codex
 
-Install the plugin for the skills, then add the server:
-
 ```sh
 codex plugin marketplace add cooklang/cooklang-skills
 codex plugin add cooklang@cooklang-skills
-codex mcp add cook -- npx -y @cookmd/mcp
 ```
 
-Codex starts a server added with `codex mcp add` in the folder you run Codex in, which becomes the recipe folder. The plugin does not start the server itself yet: plugin servers run inside the plugin's install folder, not your project.
+The plugin adds the skills and the Cook server. Codex doesn't report a workspace folder to MCP servers and starts plugin servers inside the plugin's install folder, so the server can't find your recipes by itself. Tell it where they are:
+
+```sh
+codex mcp add cook --env COOK_RECIPES_DIR=/path/to/recipes -- npx -y @cookmd/mcp
+```
+
+A server you add yourself named `cook` takes the place of the plugin's `cook` server, so only one runs. Codex config has no way to set environment variables on a plugin's server (`[plugins."cooklang@cooklang-skills".mcp_servers.cook]` only takes `enabled`, tool approval and tool lists), which is why this is a separate server entry.
 
 Without plugins, copy the skills instead: `cp -R skills/* ~/.agents/skills/`.
 
@@ -60,13 +69,15 @@ The extension adds the skills, a short `GEMINI.md` context file, and the Cook se
 
 ### Cursor
 
-Add the server with this link (paste it into your browser if it isn't clickable):
+This repo is an [Agent Plugin](https://agent-plugins.org) (root `plugin.json`, `mcp.json` and `skills/`), a format Cursor loads as a plugin. Installed that way, you get the skills and the Cook server, and the server uses the workspace folder Cursor reports.
+
+Or add only the server with this link (paste it into your browser if it isn't clickable):
 
 ```
 cursor://anysphere.cursor-deeplink/mcp/install?name=cook&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsIkBjb29rbWQvbWNwIl0sImVudiI6eyJDT09LX1JFQ0lQRVNfRElSIjoiJHt3b3Jrc3BhY2VGb2xkZXJ9In19
 ```
 
-It installs this config, which you can also put in `.cursor/mcp.json` or `~/.cursor/mcp.json` by hand:
+It installs this config, which you can also put in `.cursor/mcp.json` or `~/.cursor/mcp.json` by hand. For the skills, copy `skills/*` into `~/.cursor/skills/` (all projects) or `.cursor/skills/` in your recipe folder.
 
 ```json
 {
@@ -80,11 +91,11 @@ It installs this config, which you can also put in `.cursor/mcp.json` or `~/.cur
 }
 ```
 
-For the skills, copy `skills/*` into `~/.cursor/skills/` (all projects) or `.cursor/skills/` in your recipe folder. This repo is also an [Agent Plugin](https://agent-plugins.org) (root `plugin.json`), a format Cursor plugins accept.
-
 ### VS Code / GitHub Copilot
 
-[Install the Cook server in VS Code](https://vscode.dev/redirect/mcp/install?name=cook&config=%7B%22type%22%3A%22stdio%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40cookmd%2Fmcp%22%5D%2C%22env%22%3A%7B%22COOK_RECIPES_DIR%22%3A%22%24%7BworkspaceFolder%7D%22%7D%7D), or open this URL directly:
+Run **Chat: Install Plugin From Source** from the Command Palette and enter `https://github.com/cooklang/cooklang-skills`. That installs the skills and the Cook server; the server uses the workspace folder VS Code reports.
+
+Or add only the server: [install the Cook server in VS Code](https://vscode.dev/redirect/mcp/install?name=cook&config=%7B%22type%22%3A%22stdio%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40cookmd%2Fmcp%22%5D%2C%22env%22%3A%7B%22COOK_RECIPES_DIR%22%3A%22%24%7BworkspaceFolder%7D%22%7D%7D), or open this URL directly:
 
 ```
 vscode:mcp/install?%7B%22name%22%3A%22cook%22%2C%22type%22%3A%22stdio%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40cookmd%2Fmcp%22%5D%2C%22env%22%3A%7B%22COOK_RECIPES_DIR%22%3A%22%24%7BworkspaceFolder%7D%22%7D%7D
@@ -104,8 +115,6 @@ Or add it to `.vscode/mcp.json` in your recipe folder:
   }
 }
 ```
-
-For the skills, run **Chat: Install Plugin From Source** from the Command Palette and enter `https://github.com/cooklang/cooklang-skills`.
 
 ### Claude Desktop and other MCP clients
 
@@ -177,7 +186,7 @@ Things to ask:
 |------|-----|
 | `skills/<name>/SKILL.md` | The skills, read by every client |
 | `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` | Claude Code plugin and marketplace (Codex also reads the marketplace) |
-| `plugin.json` | [Agent Plugins](https://agent-plugins.org) manifest (Codex, Cursor, VS Code) |
+| `plugin.json`, `mcp.json` | [Agent Plugins](https://agent-plugins.org) manifest and its Cook server (Codex, Cursor, VS Code) |
 | `gemini-extension.json`, `GEMINI.md` | Gemini CLI extension and its context file |
 | `AGENTS.md` | The same short guide for agents that read `AGENTS.md` |
 | `scripts/sync-skills.sh` | Copies `skills/` from cook-mcp |

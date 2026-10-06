@@ -17,7 +17,7 @@ The `cook` MCP server (`npx -y @cookmd/mcp`) reads, searches, validates and writ
 - import and report: `import_recipe`, `render_report`
 - nutrition (`get_nutrition`, `aggregate_nutrition`, ...) and photo or social-link import need a cook.md login on Cook Basic or Pro; `login` and `auth_status` handle that. Never estimate nutrition from memory.
 
-The recipe folder is `COOK_RECIPES_DIR`, else the folder the agent was started in. If the tools say no recipe folder is set, ask the user for the path and have them set `COOK_RECIPES_DIR` in the server config. If the `cook` tools are missing, tell the user to add the server (see https://github.com/cooklang/cooklang-skills).
+The recipe folder is `COOK_RECIPES_DIR`, else the workspace folder the client reports, else the folder the server was started in (never `/`, the home folder or a plugin install folder). If the tools say no recipe folder is set, ask the user for the path and have them set `COOK_RECIPES_DIR` in the server config. If the `cook` tools are missing, tell the user to add the server (see https://github.com/cooklang/cooklang-skills).
 
 ## Skills
 
