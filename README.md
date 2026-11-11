@@ -5,7 +5,7 @@ Skills and an MCP server that let AI agents work with [Cooklang](https://cooklan
 This repo packages two things for every agent client:
 
 - **14 skills**: step-by-step guides the agent follows for writing, validating, searching, scaling, importing and exporting recipes, meal planning, shopping lists, pantry tracking, reports and nutrition.
-- **The Cook MCP server** ([`@cookmd/mcp`](https://github.com/cook-md/cook-mcp)): the tools the skills call. It reads, searches, validates and writes your files, builds shopping lists, tracks a pantry and renders reports.
+- **The Cook MCP server** ([`@cookmd/mcp`](https://github.com/cook-md/cook-mcp)): the tools the skills call. It reads, searches, validates and writes your files, builds shopping lists, tracks a pantry and renders reports. The full tool list and setup notes for each client are in the [Cook MCP documentation](https://cook.md/help/mcp).
 
 Everything runs locally and is free, with no account. Nutrition and importing from photos or social links use cook.md and need **Cook Basic** or **Cook Pro**.
 
